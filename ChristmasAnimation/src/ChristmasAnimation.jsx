@@ -3,44 +3,57 @@ import React, { useState, useEffect } from 'react';
 const ChristmasAnimation = () => {
     const [showTitle, setShowTitle] = useState(false);
     const [showBy, setShowBy] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
     const [snowflakes] = useState(() =>
-        Array.from({ length: 200 }, (_, i) => ({
+        Array.from({ length: isMobile ? 80 : 200 }, (_, i) => ({
             id: i,
             left: Math.random() * 100,
             animationDuration: 4 + Math.random() * 8,
             animationDelay: Math.random() * 5,
-            size: 3 + Math.random() * 6,
+            size: isMobile ? 2 + Math.random() * 4 : 3 + Math.random() * 6,
             opacity: 0.4 + Math.random() * 0.6,
         }))
     );
 
     const [ribbons] = useState(() =>
-        Array.from({ length: 15 }, (_, i) => ({
+        Array.from({ length: isMobile ? 8 : 15 }, (_, i) => ({
             id: i,
-            left: (i * 7) + Math.random() * 5,
+            left: (i * (isMobile ? 12 : 7)) + Math.random() * 5,
             rotation: -40 + Math.random() * 80,
-            width: 40 + Math.random() * 80,
+            width: isMobile ? 20 + Math.random() * 40 : 40 + Math.random() * 80,
             animationDelay: Math.random() * 2,
         }))
     );
 
     const [stars] = useState(() =>
-        Array.from({ length: 60 }, (_, i) => ({
+        Array.from({ length: isMobile ? 30 : 60 }, (_, i) => ({
             id: i,
             left: Math.random() * 100,
             top: Math.random() * 100,
-            size: 2 + Math.random() * 6,
+            size: isMobile ? 1 + Math.random() * 3 : 2 + Math.random() * 6,
             delay: Math.random() * 3,
             duration: 2 + Math.random() * 3,
         }))
     );
 
     const [ornaments] = useState(() =>
-        Array.from({ length: 12 }, (_, i) => ({
+        Array.from({ length: isMobile ? 8 : 12 }, (_, i) => ({
             id: i,
-            left: 10 + (i * 7.5),
-            top: 20 + Math.random() * 10,
-            size: 30 + Math.random() * 25,
+            left: 10 + (i * (isMobile ? 10 : 7.5)),
+            top: 15 + Math.random() * 15,
+            size: isMobile ? 20 + Math.random() * 15 : 30 + Math.random() * 25,
             color: ['#dc2626', '#ffffff', '#fbbf24', '#3b82f6', '#10b981'][i % 5],
             rotation: -15 + Math.random() * 30,
             animationDelay: Math.random() * 2,
@@ -50,11 +63,11 @@ const ChristmasAnimation = () => {
     );
 
     const [floatingOrnaments] = useState(() =>
-        Array.from({ length: 8 }, (_, i) => ({
+        Array.from({ length: isMobile ? 4 : 8 }, (_, i) => ({
             id: i,
-            left: 15 + (i * 10),
+            left: 15 + (i * (isMobile ? 15 : 10)),
             top: 50 + Math.random() * 40,
-            size: 20 + Math.random() * 15,
+            size: isMobile ? 15 + Math.random() * 10 : 20 + Math.random() * 15,
             color: ['#ef4444', '#84cc16', '#06b6d4', '#8b5cf6', '#f59e0b', '#ec4899'][i % 6],
             animationDelay: Math.random() * 3,
             animationDuration: 8 + Math.random() * 10,
@@ -83,7 +96,6 @@ const ChristmasAnimation = () => {
             case 1: // A strisce
                 return `
           radial-gradient(circle at 30% 30%, ${color} 0%, ${color} 10%, transparent 10.5%),
-          radial-gradient(circle at 70% 70%, ${color} 0%, ${color} 8%, transparent 8.5%),
           repeating-linear-gradient(
             45deg,
             transparent,
@@ -97,7 +109,6 @@ const ChristmasAnimation = () => {
                 return `
           radial-gradient(circle at 30% 30%, white 0%, white ${size / 8}px, transparent ${size / 8 + 1}px),
           radial-gradient(circle at 70% 70%, white 0%, white ${size / 10}px, transparent ${size / 10 + 1}px),
-          radial-gradient(circle at 50% 20%, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.5) ${size / 12}px, transparent ${size / 12 + 1}px),
           radial-gradient(ellipse at center, ${color} 30%, ${color}80 70%, ${color}40 100%),
           radial-gradient(circle at 10px 10px, rgba(255,255,255,0.2) 1px, transparent 2px),
           radial-gradient(circle at 40px 40px, rgba(255,255,255,0.2) 1px, transparent 2px)
@@ -127,7 +138,6 @@ const ChristmasAnimation = () => {
                 return `
           radial-gradient(circle at 30% 30%, white 0%, white 10%, transparent 10.5%),
           radial-gradient(circle at 70% 70%, white 0%, white 8%, transparent 8.5%),
-          radial-gradient(circle at 50% 20%, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.5) 6%, transparent 6.5%),
           radial-gradient(ellipse at center, ${lightColor} 30%, ${lightColor}80 60%, ${lightColor}40 100%),
           radial-gradient(circle at 20% 50%, rgba(255,255,255,0.2) 2px, transparent 3px),
           radial-gradient(circle at 80% 50%, rgba(255,255,255,0.2) 2px, transparent 3px)
@@ -155,24 +165,26 @@ const ChristmasAnimation = () => {
     };
 
     return (
-        <div className="relative w-full h-screen overflow-hidden bg-gradient-to-b from-green-800 via-green-700 to-green-900">
-            {/* Pattern di rami di pino animati */}
-            <div className="absolute inset-0 opacity-30">
-                {Array.from({ length: 20 }).map((_, i) => (
+        <div className="relative w-full h-screen overflow-hidden bg-gradient-to-b from-green-800 via-green-700 to-green-900 touch-none">
+            {/* Pattern di rami di pino animati - Semplificati per mobile */}
+            <div className="absolute inset-0 opacity-20 md:opacity-30">
+                {Array.from({ length: isMobile ? 10 : 20 }).map((_, i) => (
                     <div
                         key={`branch-${i}`}
                         className="absolute animate-sway-branch"
                         style={{
-                            left: i % 2 === 0 ? '-5%' : '95%',
-                            top: `${i * 5}%`,
+                            left: i % 2 === 0 ? '-10%' : '110%',
+                            top: `${i * (isMobile ? 8 : 5)}%`,
                             transform: i % 2 === 0 ? 'rotate(45deg)' : 'rotate(-45deg)',
                             animationDelay: `${i * 0.2}s`,
                         }}
                     >
-                        <div className="w-32 h-32 bg-gradient-to-br from-green-900 to-green-950 opacity-60"
+                        <div
+                            className={`${isMobile ? 'w-16 h-16' : 'w-32 h-32'} bg-gradient-to-br from-green-900 to-green-950 opacity-60`}
                             style={{
                                 clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)',
-                            }} />
+                            }}
+                        />
                     </div>
                 ))}
             </div>
@@ -189,12 +201,12 @@ const ChristmasAnimation = () => {
                         height: `${star.size}px`,
                         animationDelay: `${star.delay}s`,
                         animationDuration: `${star.duration}s`,
-                        boxShadow: '0 0 10px rgba(255,255,255,0.8)',
+                        boxShadow: '0 0 5px rgba(255,255,255,0.8)',
                     }}
                 />
             ))}
 
-            {/* Nastri rossi e bianchi ondulati */}
+            {/* Nastri rossi e bianchi ondulati - Ridotti per mobile */}
             {ribbons.map((ribbon) => (
                 <div
                     key={`ribbon-${ribbon.id}`}
@@ -214,8 +226,8 @@ const ChristmasAnimation = () => {
                                 ? 'linear-gradient(to bottom, transparent 0%, #dc2626 10%, #ffffff 20%, #dc2626 30%, transparent 40%, transparent 60%, #dc2626 70%, #ffffff 80%, #dc2626 90%, transparent 100%)'
                                 : 'linear-gradient(to bottom, transparent 0%, #ffffff 10%, #dc2626 20%, #ffffff 30%, transparent 40%, transparent 60%, #ffffff 70%, #dc2626 80%, #ffffff 90%, transparent 100%)',
                             transform: `rotate(${ribbon.rotation}deg) skewY(-10deg)`,
-                            opacity: 0.7,
-                            boxShadow: '0 0 20px rgba(220, 38, 38, 0.4)',
+                            opacity: isMobile ? 0.4 : 0.7,
+                            boxShadow: '0 0 10px rgba(220, 38, 38, 0.3)',
                         }}
                     />
                 </div>
@@ -241,10 +253,9 @@ const ChristmasAnimation = () => {
                         <div
                             className="absolute top-0 left-1/2 transform -translate-x-1/2"
                             style={{
-                                width: '2px',
-                                height: '60px',
+                                width: '1.5px',
+                                height: isMobile ? '40px' : '60px',
                                 background: 'linear-gradient(to top, #a16207, #fbbf24, #a16207)',
-                                boxShadow: '0 0 5px rgba(251, 191, 36, 0.5)',
                             }}
                         />
                     )}
@@ -253,19 +264,18 @@ const ChristmasAnimation = () => {
                     <div
                         className="absolute rounded-full animate-ornament-rotate"
                         style={{
-                            top: ornament.withCord ? '60px' : '0',
+                            top: ornament.withCord ? (isMobile ? '40px' : '60px') : '0',
                             left: '0',
                             width: '100%',
                             height: '100%',
                             background: getOrnamentPattern(ornament.type, ornament.color, ornament.size),
                             transform: `rotate(${ornament.rotation}deg)`,
                             boxShadow: `
-                inset 0 0 20px rgba(255, 255, 255, 0.3),
-                inset -10px -10px 20px rgba(0, 0, 0, 0.2),
-                0 0 25px ${ornament.color}80,
-                0 5px 15px rgba(0, 0, 0, 0.3)
+                inset 0 0 10px rgba(255, 255, 255, 0.3),
+                inset -5px -5px 10px rgba(0, 0, 0, 0.2),
+                0 0 15px ${ornament.color}80
               `,
-                            border: '2px solid rgba(255, 255, 255, 0.2)',
+                            border: '1px solid rgba(255, 255, 255, 0.2)',
                         }}
                     >
                         {/* Riflesso di luce */}
@@ -277,21 +287,6 @@ const ChristmasAnimation = () => {
                                 width: '25%',
                                 height: '25%',
                                 background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.1) 70%, transparent 100%)',
-                                filter: 'blur(1px)',
-                            }}
-                        />
-
-                        {/* Cappio superiore */}
-                        <div
-                            className="absolute left-1/2 transform -translate-x-1/2"
-                            style={{
-                                top: '-10px',
-                                width: '20px',
-                                height: '15px',
-                                background: 'radial-gradient(ellipse at center, #fbbf24 0%, #92400e 100%)',
-                                borderRadius: '10px 10px 0 0',
-                                borderTop: '2px solid rgba(255, 215, 0, 0.5)',
-                                boxShadow: '0 -2px 5px rgba(0,0,0,0.2)',
                             }}
                         />
                     </div>
@@ -318,48 +313,20 @@ const ChristmasAnimation = () => {
                         style={{
                             background: getFloatingOrnamentPattern(orb.pattern, orb.color, orb.size),
                             boxShadow: `
-                inset 0 0 30px rgba(255, 255, 255, 0.2),
-                0 0 40px ${orb.color}80,
-                0 10px 30px rgba(0, 0, 0, 0.4)
+                inset 0 0 20px rgba(255, 255, 255, 0.2),
+                0 0 20px ${orb.color}80
               `,
                             border: '1px solid rgba(255, 255, 255, 0.3)',
-                            filter: 'brightness(1.1)',
-                        }}
-                    >
-                        {/* Effetto di luce interno */}
-                        <div
-                            className="absolute rounded-full"
-                            style={{
-                                top: '20%',
-                                left: '25%',
-                                width: '30%',
-                                height: '30%',
-                                background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.1) 70%, transparent 100%)',
-                                filter: 'blur(2px)',
-                            }}
-                        />
-                    </div>
-
-                    {/* Effetto aura esterna */}
-                    <div
-                        className="absolute rounded-full animate-pulse-soft"
-                        style={{
-                            top: '-10%',
-                            left: '-10%',
-                            width: '120%',
-                            height: '120%',
-                            background: `radial-gradient(ellipse at center, ${orb.color}20 0%, transparent 70%)`,
-                            zIndex: -1,
                         }}
                     />
                 </div>
             ))}
 
-            {/* Fiocchi di neve */}
+            {/* Fiocchi di neve - Ottimizzati per mobile */}
             {snowflakes.map((flake) => (
                 <div
                     key={flake.id}
-                    className="absolute animate-fall-rotate"
+                    className="absolute pointer-events-none"
                     style={{
                         left: `${flake.left}%`,
                         width: `${flake.size}px`,
@@ -375,62 +342,59 @@ const ChristmasAnimation = () => {
                 </div>
             ))}
 
-            {/* Bacche rosse decorative pulsanti */}
-            {Array.from({ length: 40 }).map((_, i) => (
+            {/* Bacche rosse decorative pulsanti - Ridotte per mobile */}
+            {Array.from({ length: isMobile ? 20 : 40 }).map((_, i) => (
                 <div
                     key={`berry-${i}`}
                     className="absolute rounded-full bg-red-600 animate-berry-pulse"
                     style={{
-                        left: i < 20 ? `${i * 2.5}%` : `${(i - 20) * 2.5 + 50}%`,
-                        top: i < 20 ? '5%' : '95%',
-                        width: '10px',
-                        height: '10px',
+                        left: i < (isMobile ? 10 : 20) ? `${i * 5}%` : `${(i - (isMobile ? 10 : 20)) * 5 + 50}%`,
+                        top: i < (isMobile ? 10 : 20) ? '5%' : '95%',
+                        width: isMobile ? '6px' : '10px',
+                        height: isMobile ? '6px' : '10px',
                         animationDelay: `${i * 0.15}s`,
                         animationDuration: '3s',
-                        boxShadow: '0 0 15px rgba(220, 38, 38, 0.9)',
                     }}
                 />
             ))}
 
-            {/* Luci natalizie lampeggianti */}
-            {Array.from({ length: 30 }).map((_, i) => (
+            {/* Luci natalizie lampeggianti - Ridotte per mobile */}
+            {Array.from({ length: isMobile ? 15 : 30 }).map((_, i) => (
                 <div
                     key={`light-${i}`}
                     className="absolute rounded-full animate-blink"
                     style={{
-                        left: `${(i * 3.3)}%`,
+                        left: `${(i * (isMobile ? 6.6 : 3.3))}%`,
                         top: i % 2 === 0 ? '10%' : '90%',
-                        width: '12px',
-                        height: '12px',
+                        width: isMobile ? '8px' : '12px',
+                        height: isMobile ? '8px' : '12px',
                         background: ['#ffd700', '#ff0000', '#00ff00', '#ffffff'][i % 4],
                         animationDelay: `${i * 0.2}s`,
                         animationDuration: '1.5s',
-                        boxShadow: `0 0 20px ${['#ffd700', '#ff0000', '#00ff00', '#ffffff'][i % 4]}`,
                     }}
                 />
             ))}
 
-            {/* Contenuto principale */}
-            <div className="relative z-10 flex flex-col items-center justify-center h-full">
-                {/* Merry con animazione lettera per lettera */}
-                <div className="relative px-8 mb-4">
-                    <div className="flex justify-center items-center">
+            {/* Contenuto principale - Ottimizzato per mobile */}
+            <div className="relative z-10 flex flex-col items-center justify-center h-full px-4">
+                {/* Merry con animazione lettera per lettera - ANIMAZIONI RIPRISTINATE */}
+                <div className="relative px-4 mb-2 md:mb-4">
+                    <div className="flex flex-wrap justify-center items-center">
                         {merryLetters.map((letter, i) => (
                             <span
                                 key={`merry-${i}`}
-                                className={`inline-block text-8xl md:text-9xl font-black animate-letter-entry ${showTitle ? 'opacity-100' : 'opacity-0'}`}
+                                className={`inline-block ${isMobile ? 'text-5xl md:text-6xl' : 'text-8xl md:text-9xl'
+                                    } font-black ${showTitle ? 'animate-letter-pop' : 'opacity-0'}`}
                                 style={{
                                     fontFamily: 'Impact, system-ui, sans-serif',
                                     letterSpacing: '0.05em',
                                     color: '#dc2626',
-                                    textShadow: `
-                    3px 3px 0px #166534,
-                    6px 6px 0px rgba(0,0,0,0.3)
-                  `,
-                                    WebkitTextStroke: '2px white',
+                                    textShadow: isMobile
+                                        ? '2px 2px 0px #166534, 4px 4px 0px rgba(0,0,0,0.3)'
+                                        : '3px 3px 0px #166534, 6px 6px 0px rgba(0,0,0,0.3)',
+                                    WebkitTextStroke: isMobile ? '1px white' : '2px white',
                                     paintOrder: 'stroke fill',
                                     animationDelay: `${i * 0.15}s`,
-                                    transformOrigin: 'center',
                                 }}
                             >
                                 {letter}
@@ -439,25 +403,25 @@ const ChristmasAnimation = () => {
                     </div>
                 </div>
 
-                {/* Christmas con animazione lettera per lettera */}
-                <div className="relative px-8">
-                    <div className="flex justify-center items-center">
+                {/* Christmas con animazione lettera per lettera - ANIMAZIONI RIPRISTINATE */}
+                <div className="relative px-4">
+                    <div className="flex flex-wrap justify-center items-center">
                         {christmasLetters.map((letter, i) => (
                             <span
                                 key={`christmas-${i}`}
-                                className={`inline-block text-8xl md:text-9xl font-black animate-letter-entry ${showTitle ? 'opacity-100' : 'opacity-0'}`}
+                                className={`inline-block ${isMobile ? 'text-4xl md:text-5xl' : 'text-8xl md:text-9xl'
+                                    } font-black ${showTitle ? 'animate-letter-pop' : 'opacity-0'}`}
                                 style={{
                                     fontFamily: 'Impact, system-ui, sans-serif',
                                     letterSpacing: '0.05em',
                                     color: '#dc2626',
-                                    textShadow: `
-                    3px 3px 0px #166534,
-                    6px 6px 0px rgba(0,0,0,0.3)
-                  `,
-                                    WebkitTextStroke: '2px white',
+                                    textShadow: isMobile
+                                        ? '2px 2px 0px #166534, 4px 4px 0px rgba(0,0,0,0.3)'
+                                        : '3px 3px 0px #166534, 6px 6px 0px rgba(0,0,0,0.3)',
+                                    WebkitTextStroke: isMobile ? '1px white' : '2px white',
                                     paintOrder: 'stroke fill',
+                                    margin: isMobile ? '0 1px' : '0 2px',
                                     animationDelay: `${(i + merryLetters.length) * 0.15}s`,
-                                    transformOrigin: 'center',
                                 }}
                             >
                                 {letter}
@@ -466,25 +430,21 @@ const ChristmasAnimation = () => {
                     </div>
                 </div>
 
-                {/* By Giuann© */}
+                {/* By Giuann© - ANIMAZIONI RIPRISTINATE */}
                 <div
-                    className={`mt-20 transform transition-all duration-1500 ${showBy
-                            ? 'translate-y-0 opacity-100 scale-100'
-                            : 'translate-y-20 opacity-0 scale-75'
+                    className={`mt-10 md:mt-20 transform transition-all duration-1500 ${showBy
+                        ? 'translate-y-0 opacity-100 scale-100'
+                        : 'translate-y-10 md:translate-y-20 opacity-0 scale-75'
                         }`}
                 >
                     <div className="relative animate-float-bob">
-                        <p className="text-3xl md:text-4xl font-black tracking-widest animate-shimmer-glow"
+                        <p className={`${isMobile ? 'text-xl md:text-2xl' : 'text-3xl md:text-4xl'} font-black tracking-widest animate-shimmer-glow`}
                             style={{
                                 fontFamily: 'Impact, system-ui, sans-serif',
                                 color: '#ffffff',
-                                textShadow: `
-                   2px 2px 0px #dc2626,
-                   4px 4px 0px #166534,
-                   6px 6px 10px rgba(0,0,0,0.5),
-                   0 0 20px rgba(255,255,255,0.5)
-                 `,
-                                WebkitTextStroke: '1px rgba(220, 38, 38, 0.3)',
+                                textShadow: isMobile
+                                    ? '1px 1px 0px #dc2626, 2px 2px 0px #166534, 3px 3px 5px rgba(0,0,0,0.5)'
+                                    : '2px 2px 0px #dc2626, 4px 4px 0px #166534, 6px 6px 10px rgba(0,0,0,0.5), 0 0 20px rgba(255,255,255,0.5)',
                             }}>
                             by Giuann©
                         </p>
@@ -498,7 +458,7 @@ const ChristmasAnimation = () => {
             transform: translateY(-10vh) translateX(0) rotate(0deg);
           }
           100% {
-            transform: translateY(110vh) translateX(100px) rotate(360deg);
+            transform: translateY(110vh) translateX(${isMobile ? '50px' : '100px'}) rotate(360deg);
           }
         }
 
@@ -507,10 +467,10 @@ const ChristmasAnimation = () => {
             transform: translateX(0) rotate(0deg) skewY(-10deg);
           }
           33% {
-            transform: translateX(20px) rotate(3deg) skewY(-12deg);
+            transform: translateX(${isMobile ? '10px' : '20px'}) rotate(3deg) skewY(-12deg);
           }
           66% {
-            transform: translateX(-20px) rotate(-3deg) skewY(-8deg);
+            transform: translateX(${isMobile ? '-10px' : '-20px'}) rotate(-3deg) skewY(-8deg);
           }
         }
 
@@ -525,11 +485,11 @@ const ChristmasAnimation = () => {
 
         @keyframes letter-entry {
           0% {
-            transform: translateY(-100px) rotateZ(-180deg) scale(0);
+            transform: translateY(-50px) rotateZ(-180deg) scale(0);
             opacity: 0;
           }
           50% {
-            transform: translateY(20px) rotateZ(10deg) scale(1.2);
+            transform: translateY(10px) rotateZ(10deg) scale(1.1);
           }
           100% {
             transform: translateY(0) rotateZ(0deg) scale(1);
@@ -542,7 +502,7 @@ const ChristmasAnimation = () => {
             transform: translateY(0) rotate(-2deg);
           }
           50% {
-            transform: translateY(-15px) rotate(2deg);
+            transform: translateY(${isMobile ? '-8px' : '-15px'}) rotate(2deg);
           }
         }
 
@@ -564,7 +524,7 @@ const ChristmasAnimation = () => {
           }
           50% {
             opacity: 1;
-            transform: scale(1.5);
+            transform: scale(1.3);
           }
         }
 
@@ -574,7 +534,7 @@ const ChristmasAnimation = () => {
             opacity: 0.8;
           }
           50% {
-            transform: scale(1.4);
+            transform: scale(1.2);
             opacity: 1;
           }
         }
@@ -590,10 +550,10 @@ const ChristmasAnimation = () => {
 
         @keyframes ornament-swing {
           0%, 100% {
-            transform: rotate(-8deg);
+            transform: rotate(-5deg);
           }
           50% {
-            transform: rotate(8deg);
+            transform: rotate(5deg);
           }
         }
 
@@ -611,13 +571,13 @@ const ChristmasAnimation = () => {
             transform: translateY(0) translateX(0) rotate(0deg);
           }
           25% {
-            transform: translateY(-20px) translateX(10px) rotate(90deg);
+            transform: translateY(${isMobile ? '-10px' : '-20px'}) translateX(5px) rotate(90deg);
           }
           50% {
-            transform: translateY(0) translateX(20px) rotate(180deg);
+            transform: translateY(0) translateX(${isMobile ? '10px' : '20px'}) rotate(180deg);
           }
           75% {
-            transform: translateY(20px) translateX(10px) rotate(270deg);
+            transform: translateY(${isMobile ? '10px' : '20px'}) translateX(5px) rotate(270deg);
           }
         }
 
@@ -632,6 +592,35 @@ const ChristmasAnimation = () => {
           }
         }
 
+        @keyframes letter-pop-in {
+            0% {
+                opacity: 0;
+                transform: translateY(60px) rotateX(90deg) scale(0.3);
+                filter: blur(4px);
+            }
+
+            60% {
+                opacity: 1;
+                transform: translateY(-10px) rotateX(-10deg) scale(1.1);
+                filter: blur(0);
+            }
+
+            80% {
+                transform: translateY(4px) rotateX(5deg) scale(0.98);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0) rotateX(0deg) scale(1);
+            }
+            }
+
+            .animate-letter-pop {
+            animation: letter-pop-in 0.9s cubic-bezier(0.68, -0.6, 0.32, 1.6) forwards;
+            will-change: transform, opacity;
+            }
+
+        /* Classes di animazione - RIPRISTINATE */
         .animate-fall-rotate {
           animation: fall-rotate linear infinite;
         }
@@ -682,6 +671,43 @@ const ChristmasAnimation = () => {
 
         .animate-pulse-soft {
           animation: pulse-soft 4s ease-in-out infinite;
+        }
+
+        /* Performance optimization for mobile */
+        @media (max-width: 640px) {
+          .animate-letter-entry {
+            animation-duration: 0.6s !important;
+          }
+          
+          .animate-ornament-rotate {
+            animation-duration: 30s !important;
+          }
+        }
+
+        /* Reduced motion preference */
+        @media (prefers-reduced-motion: reduce) {
+          .animate-letter-entry,
+          .animate-float-bob,
+          .animate-shimmer-glow,
+          .animate-twinkle,
+          .animate-berry-pulse,
+          .animate-blink,
+          .animate-ornament-swing,
+          .animate-ornament-rotate,
+          .animate-float-spin,
+          .animate-pulse-soft,
+          .animate-fall-rotate,
+          .animate-ribbon-wave,
+          .animate-sway-branch {
+            animation: none !important;
+          }
+        }
+
+        /* Touch device optimizations */
+        @media (hover: none) and (pointer: coarse) {
+          * {
+            -webkit-tap-highlight-color: transparent;
+          }
         }
       `}</style>
         </div>
